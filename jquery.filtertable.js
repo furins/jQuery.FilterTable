@@ -38,7 +38,8 @@
 				quickListClass:    'quick',             // class of each quick list item
 				quickListGroupTag: '',                  // tag surrounding quick list items (e.g., ul)
 				quickListTag:      'a',                 // tag type of each quick list item (e.g., a or li)
-				visibleClass:      'visible'            // class applied to visible rows
+				visibleClass:      'visible',            // class applied to visible rows
+				bindExistingInput: null                 // binds to exsisting input field instead of creating new one
 			},
 			hsc = function(text) { // mimic PHP's htmlspecialchars() function
 				return text.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -72,12 +73,16 @@
 				quicks = null, // placeholder for the quick list items
 				filter = null; // placeholder for the field field DOM node
 			if (t[0].nodeName==='TABLE' && tbody.length>0 && (settings.minRows===0 || (settings.minRows>0 && tbody.find('tr').length>settings.minRows)) && !t.prev().hasClass(settings.containerClass)) { // only if object is a table and there's a tbody and at least minRows trs and hasn't already had a filter added
-				container = $('<'+settings.containerTag+' />'); // build the container tag for the filter field
-				if (settings.containerClass!=='') { // add any classes that need to be added
-					container.addClass(settings.containerClass);
-				}
-				container.prepend(settings.label+' '); // add the label for the filter field
-				filter = $('<input type="'+settings.inputType+'" placeholder="'+settings.placeholder+'" name="'+settings.inputName+'" />'); // build the filter field
+				if(settings.bindExistingInput){
+				    filter=$(settings.bindExistingInput);
+				}else {
+					container = $('<'+settings.containerTag+' />'); // build the container tag for the filter field
+					if (settings.containerClass!=='') { // add any classes that need to be added
+						container.addClass(settings.containerClass);
+					}
+					container.prepend(settings.label+' '); // add the label for the filter field
+					filter = $('<input type="'+settings.inputType+'" placeholder="'+settings.placeholder+'" name="'+settings.inputName+'" />'); // build the filter field
+			    };
 				if ($.fn.bindWithDelay) { // does bindWithDelay() exist?
 					filter.bindWithDelay('keyup', function() { // bind doFiltering() to keyup (delayed)
 						doFiltering(t, $(this).val());
